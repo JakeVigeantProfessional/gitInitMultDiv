@@ -28,23 +28,23 @@ module mult(product,overflow,multiplicand, multiplier, clk, counter);
 	assign ctrl_bits[2] = running_prod_out[2];
 
 
-	wire temp9,temp10,temp11;
+	wire w1,w3;
 
 
-	and tempGate2(temp9,ctrl_bits[0],ctrl_bits[1],ctrl_bits[2]);
-	or tempgate3(temp11,!ctrl_bits[2],temp9);
-	wire [31:0]w98,w99,w100;
-	assign w98= (ctrl_bits[0] & ctrl_bits[1] & ctrl_bits[2]) | (~ctrl_bits[0] & ~ctrl_bits[1] & ~ctrl_bits[2]) ? 0 : multiplicand;
-	assign w100=w98<<1;
-  assign w99 = (ctrl_bits[0] & ctrl_bits[1] & ~ctrl_bits[2]) |  (~ctrl_bits[0] & ~ctrl_bits[1] & ctrl_bits[2]) ? w100 :w98;
+	and tempGate2(w1,ctrl_bits[0],ctrl_bits[1],ctrl_bits[2]);
+	or tempgate3(w3,!ctrl_bits[2],w1);
+	wire [31:0]cntrlCom1,cntrlCom,cntrlCom1Shi;
+	assign cntrlCom1= (ctrl_bits[0] & ctrl_bits[1] & ctrl_bits[2]) | (~ctrl_bits[0] & ~ctrl_bits[1] & ~ctrl_bits[2]) ? 0 : multiplicand;
+	assign cntrlCom1Shi=cntrlCom1<<1;
+  assign cntrlCom = (ctrl_bits[0] & ctrl_bits[1] & ~ctrl_bits[2]) |  (~ctrl_bits[0] & ~ctrl_bits[1] & ctrl_bits[2]) ? cntrlCom1Shi :cntrlCom1;
 
 	wire [31:0]num1,num2,ans,notted;
 	wire tempHold;
 	bitwise_or ored(num1,0,running_prod_out[64:33]);
-	not32 nottedout(notted,w99);
-	assign num2= temp11 ? w99 : notted;
+	not32 nottedout(notted,cntrlCom);
+	assign num2= w3 ? cntrlCom : notted;
 	wire holdComp;
-	assign holdComp = !temp11;
+	assign holdComp = !w3;
 	adder_32 adder2(ans,num1,num2,tempHold,holdComp);
 
 
